@@ -33,7 +33,7 @@ export function PerformanceOverview() {
   const viewsData = filteredTasks
     .filter(t => t.targetViews > 0)
     .map(t => ({
-      name: t.title.length > 15 ? t.title.substring(0, 15) + '...' : t.title,
+      name: t.name.length > 15 ? t.name.substring(0, 15) + '...' : t.name,
       target: t.targetViews,
       achieved: t.achievedViews,
     }));
@@ -56,12 +56,12 @@ export function PerformanceOverview() {
   
   // Client performance (admin only)
   const clientPerformanceData = clients.map(client => {
-    const clientTasks = tasks.filter(t => t.clientId === client.id);
+    const clientTasks = tasks.filter(t => t.clientId === client.accountId._id);
     const completed = clientTasks.filter(t => t.status === 'completed').length;
     const total = clientTasks.length;
     
     return {
-      name: client.name.split(' ')[0],
+      name: client.accountId.fullName.split(' ')[0],
       completed,
       total,
       rate: total > 0 ? Math.round((completed / total) * 100) : 0,

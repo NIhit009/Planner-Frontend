@@ -163,7 +163,7 @@ export function IssueModal() {
                 <SelectItem value="">None</SelectItem>
                 {clientTasks.map((task) => (
                   <SelectItem key={task._id} value={task._id}>
-                    {task.title}
+                    {task.name}
                   </SelectItem>
                 ))}
               </SelectContent>
