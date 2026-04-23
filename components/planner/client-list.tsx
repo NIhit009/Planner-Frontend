@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils';
 import { useState } from 'react';
 
 export function ClientList() {
-  const { clients, tasks, setViewMode, setSelectedClientId } = useAppStore();
+  const { clients, tasks, setViewMode, setSelectedClientId, setIsCreateClientOpen } = useAppStore();
   const [searchQuery, setSearchQuery] = useState('');
   
   const filteredClients = clients.filter(client => 
@@ -38,7 +38,7 @@ export function ClientList() {
           <h1 className="text-xl sm:text-2xl font-bold text-foreground">Client Management</h1>
           <p className="text-sm text-muted-foreground">Manage and view all your clients</p>
         </div>
-        <Button className="w-full sm:w-auto">
+        <Button className="w-full sm:w-auto" onClick={() => setIsCreateClientOpen(true)}>
           <Plus className="w-4 h-4 mr-2" />
           Add Client
         </Button>

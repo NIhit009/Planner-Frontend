@@ -289,7 +289,7 @@ export function TaskModal() {
                 <Label className="text-xs text-muted-foreground">Achieved Views</Label>
                 <Input
                   type="number"
-                  value={formData.achievedViews}
+                  value={formData.achievedViews ?? ""}
                   onChange={(e) => setFormData({ ...formData, achievedViews: parseInt(e.target.value) || 0 })}
                   min={0}
                 />

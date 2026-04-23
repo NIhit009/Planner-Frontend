@@ -15,6 +15,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
+import { apiClient } from '@/lib/API_Client';
+import { BASE_URL } from '@/lib/Base_url';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -35,8 +37,12 @@ export function Header({ onMenuClick }: HeaderProps) {
   
   const selectedClient = clients.find(c => c.accountId._id === selectedClientId);
   
-  const handleLogout = () => {
+  const handleLogout = async () => {
     // Clear any auth state here if needed
+    localStorage.removeItem("accessToken")
+    const response = await apiClient.get(`${BASE_URL}/auth/logout`);
+    const data = response.data;
+    console.log(data.message);
     router.push('/login');
   };
 

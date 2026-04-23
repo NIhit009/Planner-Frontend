@@ -62,6 +62,8 @@ interface AppState {
   updateBulkRequest: (id: string, updates: Partial<BulkRequest>) => void;
 
   // Modal states
+  isCreateClientOpen: boolean,
+  setIsCreateClientOpen: (open: boolean) => void;
   isTaskModalOpen: boolean;
   setIsTaskModalOpen: (open: boolean) => void;
   selectedTask: Task | null;
@@ -171,7 +173,7 @@ export const useAppStore = create<AppState>((set) => ({
   },
   updateTask: async (id, updates) => {
     try {
-      const response = await apiClient.put(`/tasks/updateTasks/${id}`, updates)
+      const response = await apiClient.patch(`/tasks/updateTasks/${id}`, updates)
       const result = response.data;
       console.log(result);
       if (response.status !== 200) throw new Error("Update Task failed");
@@ -196,6 +198,8 @@ export const useAppStore = create<AppState>((set) => ({
   })),
 
   // Modal states
+  isCreateClientOpen: false,
+  setIsCreateClientOpen : (open) => set({isCreateClientOpen: open}),
   isTaskModalOpen: false,
   setIsTaskModalOpen: (open) => set({ isTaskModalOpen: open }),
   selectedTask: null,
