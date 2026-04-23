@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
+import { apiClient } from '@/lib/API_Client';
+import { BASE_URL } from '@/lib/Base_url';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -50,19 +52,12 @@ export default function LoginPage() {
     setIsLoading(true);
     // Simulate API call
     try {
-      const response = await fetch("http://localhost:5000/api/multiClientManager/auth/login", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/JSON'
-        },
-        credentials: 'include',
-        body: JSON.stringify(formData)
-      });
-      const data = await response.json();
+      const response = await apiClient.post(`${BASE_URL}/auth/login`, formData);
+      const data = await response.data
       console.log(data);
 
       if (data.success) router.push('/');
-      if (!response.ok) {
+      if (response.status !== 200) {
         setServerErrors(data.message);
         setIsLoading(false);
       }

@@ -10,6 +10,8 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { setISODay } from 'date-fns';
+import { apiClient } from '@/lib/API_Client';
+import { BASE_URL } from '@/lib/Base_url';
 
 const passwordRequirements = [
   { label: 'At least 8 characters', test: (p: string) => p.length >= 8 },
@@ -73,18 +75,11 @@ export default function SignupPage() {
     
     // Simulate API call
         try {
-      const response = await fetch("http://localhost:5000/api/multiClientManager/auth/signup", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/JSON'
-        },
-        credentials: 'include',
-        body: JSON.stringify(formData)
-      })
-      const data = await response.json();
+      const response = await apiClient.post(`${BASE_URL}/auth/signup`, formData);
+      const data = await response.data;
       console.log(data);
       if (data.success) router.push('/');
-      if (!response.ok) {
+      if (response.status !== 201) {
         setServerErrors(data.message);
         setIsLoading(false);
       }
