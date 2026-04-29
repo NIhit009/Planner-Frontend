@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { setISODay } from 'date-fns';
 import { apiClient } from '@/lib/API_Client';
 import { BASE_URL } from '@/lib/Base_url';
+import { useAppStore } from '@/lib/store';
 
 const passwordRequirements = [
   { label: 'At least 8 characters', test: (p: string) => p.length >= 8 },
@@ -22,6 +23,8 @@ const passwordRequirements = [
 
 export default function SignupPage() {
   const router = useRouter();
+  const setLoggedInRole = useAppStore((state) => state.setLoggedInRole);
+  const setViewMode = useAppStore((state) => state.setViewMode);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [serverErrors, setServerErrors] = useState<string>('');
@@ -37,62 +40,64 @@ export default function SignupPage() {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
     }
-    
+
     if (!formData.email) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email';
     }
-    
+
     if (!formData.company.trim()) {
       newErrors.company = 'Company name is required';
     }
-    
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (!passwordRequirements.every(req => req.test(formData.password))) {
       newErrors.password = 'Password does not meet requirements';
     }
-    
+
     if (!formData.acceptTerms) {
       newErrors.acceptTerms = 'You must accept the terms and conditions';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setIsLoading(true);
-    
+
     // Simulate API call
-        try {
+    try {
       const response = await apiClient.post(`${BASE_URL}/auth/signup`, formData);
       const data = await response.data;
       console.log(data);
-      if (data.success) router.push('/');
+      if (data.success) {
+        // setIsLoggedIn(true);
+        setViewMode('admin');
+        setLoggedInRole('admin');
+        router.push('/');
+      }
       if (response.status !== 201) {
-        setServerErrors(data.message);
         setIsLoading(false);
       }
       localStorage.setItem('accessToken', data.accessToken);
     }
-    catch (err) {
-      console.log(err);
+    catch (err: any) {
+      console.log(err.response?.data.message);
+      const message = err.response?.data.message;
+      setServerErrors(message);
       setIsLoading(false);
     }
-    // await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // setIsLoading(false);
-    // router.push('/');
   };
 
   const getPasswordStrength = () => {
@@ -117,7 +122,7 @@ export default function SignupPage() {
               <span className="font-bold text-2xl text-primary-foreground">C</span>
             </div>
           </div>
-          
+
           <div className="text-center lg:text-left">
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Create an account</h2>
             <p className="mt-2 text-muted-foreground">
@@ -147,7 +152,7 @@ export default function SignupPage() {
                 <p className="text-sm text-destructive">{errors.name}</p>
               )}
             </div>
-            
+
             {/* Email Field */}
             <div className="space-y-2">
               <Label htmlFor="email">Email address</Label>
@@ -169,7 +174,7 @@ export default function SignupPage() {
                 <p className="text-sm text-destructive">{errors.email}</p>
               )}
             </div>
-            
+
             {/* Company Field */}
             <div className="space-y-2">
               <Label htmlFor="company">Company name</Label>
@@ -191,7 +196,7 @@ export default function SignupPage() {
                 <p className="text-sm text-destructive">{errors.company}</p>
               )}
             </div>
-            
+
             {/* Password Field */}
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
@@ -220,21 +225,21 @@ export default function SignupPage() {
                   )}
                 </button>
               </div>
-              
+
               {/* Password Strength Bar */}
               {formData.password && (
                 <div className="space-y-2">
                   <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                    <div 
+                    <div
                       className={cn("h-full transition-all duration-300", strength.color)}
                       style={{ width: strength.width }}
                     />
                   </div>
-                  
+
                   {/* Password Requirements */}
                   <div className="grid grid-cols-2 gap-1">
                     {passwordRequirements.map((req, index) => (
-                      <div 
+                      <div
                         key={index}
                         className={cn(
                           "flex items-center gap-1.5 text-xs transition-colors",
@@ -272,14 +277,14 @@ export default function SignupPage() {
                 onChange={handleRoleChange}  />
               </div>
             </div> */}
-            
+
             {/* Terms and Conditions */}
             <div className="space-y-1">
               <div className="flex items-start gap-2">
                 <Checkbox
                   id="terms"
                   checked={formData.acceptTerms}
-                  onCheckedChange={(checked) => 
+                  onCheckedChange={(checked) =>
                     setFormData({ ...formData, acceptTerms: checked as boolean })
                   }
                   className="mt-0.5"
@@ -299,10 +304,10 @@ export default function SignupPage() {
                 <p className="text-sm text-destructive">{errors.acceptTerms}</p>
               )}
             </div>
-            
+
             {/* Submit Button */}
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="w-full h-12 text-base"
               disabled={isLoading}
             >
@@ -319,7 +324,7 @@ export default function SignupPage() {
               )}
             </Button>
           </form>
-          
+
           {/* Divider */}
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -329,7 +334,7 @@ export default function SignupPage() {
               <span className="bg-background px-2 text-muted-foreground">Or sign up with</span>
             </div>
           </div>
-          
+
           {/* Social Signup */}
           <div className="grid grid-cols-2 gap-3">
             <Button variant="outline" className="h-12">
@@ -355,12 +360,12 @@ export default function SignupPage() {
             </Button>
             <Button variant="outline" className="h-12">
               <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
               </svg>
               GitHub
             </Button>
           </div>
-          
+
           {/* Login Link */}
           <p className="text-center text-sm text-muted-foreground">
             Already have an account?{' '}
@@ -370,7 +375,7 @@ export default function SignupPage() {
           </p>
         </div>
       </div>
-      
+
       {/* Right side - Branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-primary relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-bl from-primary to-primary/80" />
@@ -380,7 +385,7 @@ export default function SignupPage() {
               <span className="font-bold text-2xl">C</span>
             </div>
           </div>
-          
+
           <div className="space-y-8">
             <div className="space-y-6">
               <h1 className="text-4xl font-bold leading-tight text-balance">
@@ -390,7 +395,7 @@ export default function SignupPage() {
                 Powerful features designed for agencies and freelancers who manage multiple clients.
               </p>
             </div>
-            
+
             {/* Features */}
             <div className="space-y-4">
               {[
@@ -408,12 +413,12 @@ export default function SignupPage() {
               ))}
             </div>
           </div>
-          
+
           <p className="text-sm text-primary-foreground/60">
             Multi-Client Planner 2024
           </p>
         </div>
-        
+
         {/* Decorative elements */}
         <div className="absolute -left-20 -top-20 w-80 h-80 bg-primary-foreground/5 rounded-full" />
         <div className="absolute -left-10 top-1/2 w-60 h-60 bg-primary-foreground/5 rounded-full" />

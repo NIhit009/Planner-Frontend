@@ -24,19 +24,30 @@ interface HeaderProps {
 
 export function Header({ onMenuClick }: HeaderProps) {
   const router = useRouter();
-  const { 
-    viewMode, 
-    setViewMode, 
-    calendarView, 
-    setCalendarView,
-    clients,
-    selectedClientId,
-    setSelectedClientId,
-    setIsTaskModalOpen
-  } = useAppStore();
-  
+  // const {
+  //   viewMode,
+  //   setViewMode,
+  //   calendarView,
+  //   setCalendarView,
+  //   clients,
+  //   selectedClientId,
+  //   setSelectedClientId,
+  //   setIsTaskModalOpen,
+  //   LoggedInRole
+  // } = useAppStore();
+
+  const viewMode = useAppStore((state) => state.viewMode);
+  const setViewMode = useAppStore((state) => state.setViewMode);
+  const calendarView = useAppStore((state) => state.calendarView);
+  const setCalendarView = useAppStore((state) => state.setCalendarView);
+  const clients = useAppStore((state) => state.clients);
+  const selectedClientId = useAppStore((state) => state.selectedClientId);
+  const setSelectedClientId = useAppStore((state) => state.setSelectedClientId);
+  const setIsTaskModalOpen = useAppStore((state) => state.setIsTaskModalOpen);
+  const LoggedInRole = useAppStore((state) => state.LoggedInRole);
+
   const selectedClient = clients.find(c => c.accountId._id === selectedClientId);
-  
+
   const handleLogout = async () => {
     // Clear any auth state here if needed
     localStorage.removeItem("accessToken")
@@ -51,15 +62,15 @@ export function Header({ onMenuClick }: HeaderProps) {
       {/* Left section - Menu & View Toggle */}
       <div className="flex items-center gap-2 sm:gap-4">
         {/* Mobile menu button */}
-        <Button 
-          variant="ghost" 
-          size="icon" 
+        <Button
+          variant="ghost"
+          size="icon"
           className="lg:hidden h-9 w-9"
           onClick={onMenuClick}
         >
           <Menu className="w-5 h-5" />
         </Button>
-        
+
         <div className="hidden sm:flex bg-muted rounded-lg p-1">
           {(['day', 'week', 'month'] as const).map((view) => (
             <button
@@ -67,8 +78,8 @@ export function Header({ onMenuClick }: HeaderProps) {
               onClick={() => setCalendarView(view)}
               className={cn(
                 "px-4 py-1.5 text-sm font-medium rounded-md transition-colors capitalize",
-                calendarView === view 
-                  ? "bg-background text-foreground shadow-sm" 
+                calendarView === view
+                  ? "bg-background text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
@@ -77,7 +88,7 @@ export function Header({ onMenuClick }: HeaderProps) {
           ))}
         </div>
       </div>
-      
+
       {/* Center section - Search */}
       <div className="hidden md:flex flex-1 max-w-md mx-4 lg:mx-8">
         <div className="relative w-full">
@@ -88,7 +99,7 @@ export function Header({ onMenuClick }: HeaderProps) {
           />
         </div>
       </div>
-      
+
       {/* Right section - Actions & Profile */}
       <div className="flex items-center gap-1 sm:gap-4">
         {/* Mobile search button */}
@@ -102,7 +113,10 @@ export function Header({ onMenuClick }: HeaderProps) {
         <Button variant="ghost" size="icon" className="hidden sm:flex text-muted-foreground h-9 w-9">
           <HelpCircle className="w-5 h-5" />
         </Button>
-        
+        <Button className="w-full sm:w-auto bg-red-100 hover:bg-red-200 text-red-700 border border-red-300">
+          Report an issue
+        </Button>
+
         {/* User Profile & View Toggle */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -123,10 +137,10 @@ export function Header({ onMenuClick }: HeaderProps) {
               </div>
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
+          {(LoggedInRole === 'admin') ? <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>Switch View</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={() => setViewMode('admin')}
               className={cn(viewMode === 'admin' && "bg-muted")}
             >
@@ -135,28 +149,37 @@ export function Header({ onMenuClick }: HeaderProps) {
             <DropdownMenuSeparator />
             <DropdownMenuLabel>Client View</DropdownMenuLabel>
             {clients.map((client) => (
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 key={client.accountId._id}
                 onClick={() => {
                   setViewMode('client');
                   setSelectedClientId(client.accountId._id);
                 }}
                 className={cn(
-                  viewMode === 'client' && selectedClientId === client.accountId._id && "bg-muted"
+                  selectedClientId === client.accountId._id && "bg-muted"
                 )}
               >
                 {client.accountId.fullName}
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={handleLogout}
               className="text-destructive focus:text-destructive"
             >
               <LogOut className="w-4 h-4 mr-2" />
               Logout
             </DropdownMenuItem>
-          </DropdownMenuContent>
+          </DropdownMenuContent> : <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuItem
+              onClick={handleLogout}
+              className="text-destructive focus:text-destructive"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
+            </DropdownMenuItem>
+          </DropdownMenuContent>}
+
         </DropdownMenu>
       </div>
     </header>
@@ -164,13 +187,17 @@ export function Header({ onMenuClick }: HeaderProps) {
 }
 
 export function CalendarHeader() {
-  const { currentDate, setIsTaskModalOpen } = useAppStore();
+  // const { currentDate, setIsTaskModalOpen } = useAppStore();
+  const currentDate = useAppStore((state) => state.currentDate);
+  const setIsTaskModalOpen = useAppStore((state) => state.setIsTaskModalOpen);
+  const LoggedInRole = useAppStore((state) => state.LoggedInRole);
+  const viewMode = useAppStore((state) => state.viewMode);
   const monthYear = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-  
+
   return (
     <div className="flex items-center justify-between py-3 sm:py-4 px-3 sm:px-6 border-b border-border bg-card gap-2">
       <h1 className="text-lg sm:text-2xl font-bold text-foreground truncate">{monthYear}</h1>
-      
+
       <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
         <Button variant="outline" className="text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3">
           Today
@@ -181,12 +208,12 @@ export function CalendarHeader() {
         <Button variant="ghost" size="icon" className="hidden sm:flex h-9 w-9">
           <List className="w-4 h-4" />
         </Button>
-        <Button 
+        <Button
           className="bg-primary text-primary-foreground h-8 sm:h-9 px-2 sm:px-4 text-xs sm:text-sm"
           onClick={() => setIsTaskModalOpen(true)}
         >
           <Plus className="w-4 h-4 sm:mr-2" />
-          <span className="hidden sm:inline">Add Schedule</span>
+          {(LoggedInRole === 'admin' && viewMode === 'admin') ? <span className="hidden sm:inline">Add to Schedule</span> : <span className="hidden sm:inline">Request Work</span>}
         </Button>
       </div>
     </div>

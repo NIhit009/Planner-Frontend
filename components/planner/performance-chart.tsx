@@ -22,7 +22,11 @@ import { getTaskStats, getIssueStats } from '@/lib/mock-data';
 const COLORS = ['#3b82f6', '#22c55e', '#f59e0b', '#ef4444'];
 
 export function PerformanceOverview() {
-  const { tasks, clients, viewMode, selectedClientId } = useAppStore();
+
+  const tasks = useAppStore((state) => state.tasks);
+  const clients = useAppStore((state) => state.clients);
+  const viewMode = useAppStore((state) => state.viewMode);
+  const selectedClientId = useAppStore((state) => state.selectedClientId);
   
   // Filter tasks based on view mode
   const filteredTasks = viewMode === 'client' && selectedClientId

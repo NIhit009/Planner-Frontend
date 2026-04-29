@@ -37,18 +37,18 @@ const statusOptions = [
 ];
 
 export function IssueModal() {
-  const { 
-    isIssueModalOpen, 
-    setIsIssueModalOpen,
-    selectedIssue,
-    setSelectedIssue,
-    selectedClientId,
-    viewMode,
-    tasks,
-    addIssue,
-    updateIssue
-  } = useAppStore();
-  
+
+  const isIssueModalOpen = useAppStore((state) => state.isIssueModalOpen);
+  const setIsIssueModalOpen = useAppStore((state) => state.setIsIssueModalOpen);
+  const selectedClientId = useAppStore((state) => state.selectedClientId);
+  const selectedIssue = useAppStore((state) => state.selectedIssue);
+  const setSelectedIssue = useAppStore((state) => state.setSelectedIssue);
+  const viewMode = useAppStore((state) => state.viewMode);
+  const tasks = useAppStore((state) => state.tasks);
+  const addIssue = useAppStore((state) => state.addIssue);
+  const updateIssue = useAppStore((state) => state.updateIssue);
+
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',

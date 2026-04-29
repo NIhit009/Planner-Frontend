@@ -31,12 +31,10 @@ const typeOptions = [
 ];
 
 export function BulkRequestModal() {
-  const { 
-    isBulkRequestModalOpen, 
-    setIsBulkRequestModalOpen,
-    selectedClientId,
-    addBulkRequest
-  } = useAppStore();
+  const isBulkRequestModalOpen = useAppStore((state) => state.isBulkRequestModalOpen);
+  const setIsBulkRequestModalOpen = useAppStore((state) => state.setIsBulkRequestModalOpen);
+  const selectedClientId = useAppStore((state) => state.selectedClientId);
+  const addBulkRequest = useAppStore((state) => state.addBulkRequest);
   
   const [formData, setFormData] = useState({
     type: 'banner' as BulkRequest['type'],

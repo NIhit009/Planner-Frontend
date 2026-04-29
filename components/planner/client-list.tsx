@@ -17,7 +17,11 @@ import { cn } from '@/lib/utils';
 import { useState } from 'react';
 
 export function ClientList() {
-  const { clients, tasks, setViewMode, setSelectedClientId, setIsCreateClientOpen } = useAppStore();
+  const clients = useAppStore((state) => state.clients);
+  const tasks = useAppStore((state) => state.tasks);
+  const setViewMode = useAppStore((state) => state.setViewMode);
+  const setSelectedClientId = useAppStore((state) => state.setSelectedClientId);
+  const setIsCreateClientOpen = useAppStore((state) => state.setIsCreateClientOpen);
   const [searchQuery, setSearchQuery] = useState('');
   
   const filteredClients = clients.filter(client => 

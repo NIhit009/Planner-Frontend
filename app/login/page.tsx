@@ -11,8 +11,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { apiClient } from '@/lib/API_Client';
 import { BASE_URL } from '@/lib/Base_url';
+import { useAppStore } from '@/lib/store';
 
 export default function LoginPage() {
+  const setLoggedInRole = useAppStore((state) => state.setLoggedInRole);
+  const setViewMode = useAppStore((state) => state.setViewMode);
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -53,26 +56,32 @@ export default function LoginPage() {
     // Simulate API call
     try {
       const response = await apiClient.post(`${BASE_URL}/auth/login`, formData);
-      const data = await response.data
-      console.log(data);
-
-      if (data.success) router.push('/');
       if (response.status !== 200) {
-        setServerErrors(data.message);
         setIsLoading(false);
+        return;
+      }
+      const data = await response.data;
+      console.log(data);
+      if (data.success) {
+        // setIsLoggedIn(true);
+        setViewMode(formData.role);
+        setLoggedInRole(formData.role);
+        router.push('/');
       }
       localStorage.setItem('accessToken', data.accessToken);
     }
-    catch (err) {
-      console.log(err);
+    catch (error: any) {
+      const message = error.response?.data.message;
+      console.log(error.response?.data.message);
+      setServerErrors(message);
       setIsLoading(false);
     }
 
   };
 
-  const handleRoleChange = (e : React.ChangeEvent<HTMLInputElement>) => {
-      setFormData({...formData, role: e.target.value});
-      console.log(formData);
+  const handleRoleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, role: e.target.value });
+    console.log(formData);
   }
 
   return (
@@ -208,18 +217,18 @@ export default function LoginPage() {
                 <Label>Admin</Label>
                 <input
                   type='radio'
-                  value='admin' 
-                  name='role' 
+                  value='admin'
+                  name='role'
                   checked={formData.role === 'admin'}
-                  onChange={handleRoleChange}  />
+                  onChange={handleRoleChange} />
               </div>
               <div className='flex gap-2'>
                 <Label>Client</Label>
-                <input type='radio' 
-                value='client' 
-                name='role' 
-                checked={formData.role === 'client'}
-                onChange={handleRoleChange}  />
+                <input type='radio'
+                  value='client'
+                  name='role'
+                  checked={formData.role === 'client'}
+                  onChange={handleRoleChange} />
               </div>
             </div>
 

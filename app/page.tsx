@@ -12,11 +12,26 @@ import { BulkRequestModal } from '@/components/planner/bulk-request-modal';
 import { IssueModal } from '@/components/planner/issue-modal';
 import { useAppStore } from '@/lib/store';
 import CreateClientForm from '@/components/planner/ClientForm';
+import { CompletedTasks } from '@/components/planner/completed-tasks';
+// import { useRouter } from 'next/navigation';
 
 export default function PlannerPage() {
   const [activeNav, setActiveNav] = useState('calendar');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { viewMode, fetchInitialData } = useAppStore();
+  // const router = useRouter();
+  const viewMode = useAppStore((state) => state.viewMode);
+  const fetchInitialData = useAppStore((state) => state.fetchInitialData);
+  const isLoggedIn  = useAppStore((state) => state.isLoggedIn);
+  const LoggedInRole = useAppStore((state) => state.LoggedInRole);
+
+  // Check Login status
+  // useEffect(() => {
+  //   if (!isLoggedIn) {
+  //     router.push('/login');
+  //     return;
+  //   }
+  // }, [])
+
 
   // FIXED: Logic to handle highlighting and drawer visibility
   const handleNavChange = (nav: string) => {
@@ -29,8 +44,7 @@ export default function PlannerPage() {
     }
   };
   useEffect(() => {
-    let isMounted = true;
-
+    if (isLoggedIn) return;
     const loadData = async () => {
       try {
         await fetchInitialData();
@@ -38,18 +52,13 @@ export default function PlannerPage() {
         console.error("Failed to load initial planner data:", error);
       }
     };
-
     loadData();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [fetchInitialData]);
+  }, [fetchInitialData, isLoggedIn, viewMode]);
 
   const renderContent = () => {
     switch (activeNav) {
       case 'dashboard':
-        return viewMode === 'admin' ? <AdminDashboard /> : <ClientDashboard />;
+        return (viewMode === 'admin' && LoggedInRole === 'admin') ? <AdminDashboard /> : <ClientDashboard />;
       case 'calendar':
         return (
           <div className="flex flex-col flex-1 overflow-hidden">
@@ -58,7 +67,7 @@ export default function PlannerPage() {
           </div>
         );
       case 'clients':
-        return viewMode === 'admin' ? <ClientList /> : <ClientDashboard />;
+        return (viewMode === 'admin' && LoggedInRole === 'admin') ? <ClientList /> : <ClientDashboard />;
       case 'reports':
         return <PerformanceOverview />;
       case 'settings':
@@ -70,6 +79,8 @@ export default function PlannerPage() {
             </div>
           </div>
         );
+      case 'completed':
+        return <CompletedTasks />
       default:
         return null;
     }

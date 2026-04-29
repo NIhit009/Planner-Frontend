@@ -4,7 +4,7 @@ import { useState } from 'react';
 import {
   LayoutGrid, Calendar, Users, FileText, Settings,
   ChevronLeft, ChevronRight, X, ChevronUp, ChevronDown,
-  LogOut, User, Bell, Moon
+  LogOut, User, Bell, CheckCircle2 // Added CheckCircle2
 } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, getDay } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -24,23 +24,23 @@ interface SidebarProps {
 
 export function Sidebar({ activeNav, onNavChange, isOpen, onClose }: SidebarProps) {
   const router = useRouter();
-  const {
-    viewMode,
-    currentDate,
-    setCurrentDate,
-    calendarFilters,
-    toggleCalendarFilter,
-    categoryFilters
-  } = useAppStore();
-  
+
+  const viewMode = useAppStore((state) => state.viewMode);
+  const currentDate = useAppStore((state) => state.currentDate);
+  const LoggedInRole = useAppStore((state) => state.LoggedInRole);
+  const setCurrentDate = useAppStore((state) => state.setCurrentDate);
+  const calendarFilters = useAppStore((state) => state.calendarFilters);
+  const toggleCalendarFilter = useAppStore((state) => state.toggleCalendarFilter);
+  const categoryFilters = useAppStore((state) => state.categoryFilters);
+
   const [showMyCalendars, setShowMyCalendars] = useState(true);
   const [showCategories, setShowCategories] = useState(true);
-  
 
-  // Core navigation items
+  // Core navigation items - Completed Tasks added here
   const navItems = [
     { id: 'dashboard', icon: LayoutGrid, label: 'Home' },
     { id: 'calendar', icon: Calendar, label: 'Calendar' },
+    { id: 'completed', icon: CheckCircle2, label: 'Completed Tasks' },
     { id: 'clients', icon: Users, label: 'Clients', adminOnly: true },
     { id: 'reports', icon: FileText, label: 'Reports' },
   ];
@@ -52,12 +52,14 @@ export function Sidebar({ activeNav, onNavChange, isOpen, onClose }: SidebarProp
     end: endOfMonth(currentDate)
   });
   const paddingDays = Array(getDay(monthStart)).fill(null);
+
   const handleLogout = async () => {
-    // Clear any auth state here if needed
-    localStorage.removeItem("accessToken")
-    const response = await apiClient.get(`${BASE_URL}/auth/logout`);
-    const data = response.data;
-    console.log(data.message);
+    localStorage.removeItem("accessToken");
+    try {
+      await apiClient.get(`${BASE_URL}/auth/logout`);
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
     router.push('/login');
   };
 
@@ -111,24 +113,18 @@ export function Sidebar({ activeNav, onNavChange, isOpen, onClose }: SidebarProp
 
         <div className="p-5 border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center text-white font-bold">C</div>
-            <span className="font-bold text-lg">
-              Multi Client Manager
-            </span>
+            <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center text-white font-bold">V</div>
+            <span className="font-bold text-lg">Void Planner</span>
           </div>
           <Button variant="ghost" size="icon" className="lg:hidden" onClick={onClose}><X className="w-5 h-5" /></Button>
         </div>
 
         <div className="flex-1 overflow-y-auto custom-scrollbar">
-          {/* MOBILE SETTINGS CONTENT (Visible when Drawer is Open) */}
+          {/* MOBILE SETTINGS CONTENT */}
           {isOpen && (
             <div className="lg:hidden p-6 space-y-4">
               <button className="w-full flex items-center justify-between p-4 bg-muted/50 rounded-2xl">
                 <div className="flex items-center gap-3"><User className="w-5 h-5" /> <span>Profile</span></div>
-                <ChevronRight className="w-4 h-4" />
-              </button>
-              <button className="w-full flex items-center justify-between p-4 bg-muted/50 rounded-2xl">
-                <div className="flex items-center gap-3"><Bell className="w-5 h-5" /> <span>Notifications</span></div>
                 <ChevronRight className="w-4 h-4" />
               </button>
               <button className="w-full flex items-center gap-3 p-4 text-destructive font-bold mt-4" onClick={handleLogout}>
@@ -139,11 +135,10 @@ export function Sidebar({ activeNav, onNavChange, isOpen, onClose }: SidebarProp
 
           {/* DESKTOP SIDEBAR CONTENT */}
           <div className="hidden lg:block">
-            {/* 1. Primary Navigation */}
             <nav className="py-4 px-3 border-b border-border">
               <ul className="space-y-1">
                 {navItems.map((item) => {
-                  if (item.adminOnly && viewMode !== 'admin') return null;
+                  if (item.adminOnly && LoggedInRole !== 'admin') return null;
                   return (
                     <li key={item.id}>
                       <button
@@ -158,7 +153,6 @@ export function Sidebar({ activeNav, onNavChange, isOpen, onClose }: SidebarProp
                     </li>
                   );
                 })}
-                {/* Desktop Settings Link */}
                 <li>
                   <button
                     onClick={() => onNavChange('settings')}
@@ -173,7 +167,7 @@ export function Sidebar({ activeNav, onNavChange, isOpen, onClose }: SidebarProp
               </ul>
             </nav>
 
-            {/* 2. Mini Calendar Restored */}
+            {/* Mini Calendar */}
             <div className="p-4 border-b border-border">
               <div className="flex items-center justify-between mb-4 text-sm font-bold">
                 {format(currentDate, 'MMMM yyyy')}
@@ -183,7 +177,7 @@ export function Sidebar({ activeNav, onNavChange, isOpen, onClose }: SidebarProp
                 </div>
               </div>
               <div className="grid grid-cols-7 gap-1 text-center text-[10px] mb-2 font-bold opacity-50 uppercase tracking-tighter">
-                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => <div key={d}>{d[0]}</div>)}
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => <div key={d}>{d}</div>)}
                 {paddingDays.map((_, i) => <div key={`pad-${i}`} />)}
                 {days.map(day => (
                   <button
@@ -200,9 +194,8 @@ export function Sidebar({ activeNav, onNavChange, isOpen, onClose }: SidebarProp
               </div>
             </div>
 
-            {/* 3. Filters Restored */}
+            {/* Filters */}
             <div className="p-4 space-y-6">
-              {/* Calendar Filters */}
               <div>
                 <button onClick={() => setShowMyCalendars(!showMyCalendars)} className="w-full flex items-center justify-between text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-4">
                   <span>Calendars</span> {showMyCalendars ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
@@ -211,11 +204,7 @@ export function Sidebar({ activeNav, onNavChange, isOpen, onClose }: SidebarProp
                   <ul className="space-y-3">
                     {calendarFilters.map(f => (
                       <li key={f.id} className="flex items-center gap-3">
-                        <Checkbox
-                          id={`cal-${f.id}`}
-                          checked={f.enabled}
-                          onCheckedChange={() => toggleCalendarFilter(f.id)}
-                        />
+                        <Checkbox id={`cal-${f.id}`} checked={f.enabled} onCheckedChange={() => toggleCalendarFilter(f.id)} />
                         <label htmlFor={`cal-${f.id}`} className="text-sm font-medium cursor-pointer">{f.emoji} {f.name}</label>
                       </li>
                     ))}
@@ -223,7 +212,6 @@ export function Sidebar({ activeNav, onNavChange, isOpen, onClose }: SidebarProp
                 )}
               </div>
 
-              {/* Task Type Filters */}
               <div>
                 <button onClick={() => setShowCategories(!showCategories)} className="w-full flex items-center justify-between text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-4">
                   <span>Task Types</span> {showCategories ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}

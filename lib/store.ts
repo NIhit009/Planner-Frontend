@@ -23,8 +23,16 @@ interface CalendarFilter {
 
 interface AppState {
   // View mode
-  viewMode: 'admin' | 'client';
-  setViewMode: (mode: 'admin' | 'client') => void;
+  viewMode: string;
+  setViewMode: (mode: string) => void;
+
+  //Logged In Role
+  LoggedInRole: string,
+  setLoggedInRole: (mode: string) => void;
+
+  // LoggedIn
+  isLoggedIn: boolean,
+  setIsLoggedIn: (loggedIn: boolean) => void
 
   // Selected client (for client view)
   selectedClientId: string | null;
@@ -83,6 +91,12 @@ export const useAppStore = create<AppState>((set) => ({
   viewMode: 'admin',
   setViewMode: (mode) => set({ viewMode: mode }),
 
+  //Logged In Role
+  LoggedInRole: '',
+  setLoggedInRole: (mode) => set({LoggedInRole: mode}),
+
+  isLoggedIn: false,
+  setIsLoggedIn: (loggedIn) => set({isLoggedIn: loggedIn}),
   // Selected client
   selectedClientId: '',
   setSelectedClientId: (id) => set({ selectedClientId: id }),
@@ -131,8 +145,8 @@ export const useAppStore = create<AppState>((set) => ({
   fetchInitialData: async () => {
     try {
       const [taskRes, clientRes] = await Promise.all([
-        apiClient.get("/tasks/getTasks"), // Assuming you have TASK_GET
-        apiClient.get("/clients/clients") // Assuming you have CLIENT_GET
+        apiClient.get("/tasks/getTasks"),
+        apiClient.get("/clients/clients") 
       ]);
 
       const taskData = taskRes.data;

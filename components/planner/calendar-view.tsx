@@ -53,16 +53,14 @@ function CalendarEvent({ task, onClick }: CalendarEventProps) {
 }
 
 export function CalendarView() {
-  const { 
-    currentDate, 
-    tasks, 
-    calendarFilters,
-    categoryFilters,
-    viewMode,
-    selectedClientId,
-    setSelectedTask,
-    setIsTaskModalOpen
-  } = useAppStore();
+  const currentDate = useAppStore((state) => state.currentDate);
+  const tasks = useAppStore((state) => state.tasks);
+  const calendarFilters = useAppStore((state) => state.calendarFilters);
+  const categoryFilters = useAppStore((state) => state.categoryFilters);
+  const viewMode = useAppStore((state) => state.viewMode);
+  const selectedClientId = useAppStore((state) => state.selectedClientId);
+  const setIsTaskModalOpen = useAppStore((state) => state.setIsTaskModalOpen);
+  const setSelectedTask = useAppStore((state) => state.setSelectedTask);
   
   // Get the days to display
   const monthStart = startOfMonth(currentDate);

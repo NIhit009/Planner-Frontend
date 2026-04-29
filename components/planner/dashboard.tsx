@@ -242,15 +242,21 @@ export function AdminDashboard() {
 }
 
 export function ClientDashboard() {
-  const { 
-    selectedClientId, 
-    clients, 
-    tasks, 
-    issues,
-    setIsTaskModalOpen,
-    setIsBulkRequestModalOpen
-  } = useAppStore();
-  
+  // const { 
+  //   selectedClientId, 
+  //   clients, 
+  //   tasks, 
+  //   issues,
+  //   setIsTaskModalOpen,
+  //   setIsBulkRequestModalOpen
+  // } = useAppStore();
+  const selectedClientId = useAppStore((state) => state.selectedClientId);
+  const clients = useAppStore((state) => state.clients);
+  const tasks = useAppStore((state) => state.tasks);
+  const issues = useAppStore((state) => state.issues);
+  const setIsTaskModalOpen = useAppStore((state) => state.setIsTaskModalOpen);
+  const setIsBulkRequestModalOpen = useAppStore((state) => state.setIsBulkRequestModalOpen);
+
   const client = clients.find(c => c.accountId._id === selectedClientId);
   const clientTasks = tasks.filter(t => t.clientId === selectedClientId);
   const clientIssues = issues.filter(i => i.clientId === selectedClientId);
@@ -453,7 +459,7 @@ export function ClientDashboard() {
                   )} />
                   <div>
                     <p className="font-medium text-sm">{task.name}</p>
-                    <p className="text-xs text-muted-foreground">{task.deadline}</p>
+                    <p className="text-xs text-muted-foreground">{task.deadline.split("T")[0]}</p>
                   </div>
                 </div>
                 <span className={cn(

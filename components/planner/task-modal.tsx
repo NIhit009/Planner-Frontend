@@ -39,19 +39,29 @@ const statusOptions = [
 ];
 
 export function TaskModal() {
-  const { 
-    isTaskModalOpen, 
-    setIsTaskModalOpen, 
-    selectedTask, 
-    setSelectedTask,
-    clients,
-    viewMode,
-    selectedClientId,
-    addTask,
-    updateTask,
-    currentDate
-  } = useAppStore();
-  
+  // const { 
+  //   isTaskModalOpen, 
+  //   setIsTaskModalOpen, 
+  //   selectedTask, 
+  //   setSelectedTask,
+  //   clients,
+  //   viewMode,
+  //   selectedClientId,
+  //   addTask,
+  //   updateTask,
+  //   currentDate
+  // } = useAppStore();
+  const isTaskModalOpen = useAppStore((state) => state.isTaskModalOpen);
+  const setIsTaskModalOpen = useAppStore((state) => state.setIsTaskModalOpen);
+  const selectedTask = useAppStore((state) => state.selectedTask);
+  const setSelectedTask = useAppStore((state) => state.setSelectedTask);
+  const clients = useAppStore((state) => state.clients);
+  const viewMode = useAppStore((state) => state.viewMode);
+  const selectedClientId = useAppStore((state) => state.selectedClientId);
+  const addTask = useAppStore((state) => state.addTask);
+  const updateTask = useAppStore((state) => state.updateTask);
+  const currentDate = useAppStore((state) => state.currentDate);
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -178,12 +188,18 @@ export function TaskModal() {
                 </SelectContent>
               </Select>
             </div>
-            
+            {/* Status */}
             <div className="space-y-2">
               <Label>Status</Label>
               <Select 
                 value={formData.status} 
-                onValueChange={(value: Task['status']) => setFormData({ ...formData, status: value })}
+                onValueChange={(value: Task['status']) => setFormData((prev) =>{
+                  if (value === 'completed'){
+                    return {...prev, status: value, completedDate: Date.now()}
+                  }
+                  return {...prev, status: value}
+                }
+                )}
               >
                 <SelectTrigger>
                   <SelectValue />

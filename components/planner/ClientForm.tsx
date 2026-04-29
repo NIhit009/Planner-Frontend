@@ -19,7 +19,8 @@ interface FormData {
 }
 
 export default function CreateClientForm() {
-  const { isCreateClientOpen, setIsCreateClientOpen } = useAppStore();
+  const isCreateClientOpen = useAppStore((state) => state.isCreateClientOpen);
+  const setIsCreateClientOpen = useAppStore((state) => state.setIsCreateClientOpen);
   const [form, setForm] = useState<FormData>({
     avatar: null,
     fullName: "",
