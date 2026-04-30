@@ -46,6 +46,7 @@ export function Header({ onMenuClick }: HeaderProps) {
   const setIsTaskModalOpen = useAppStore((state) => state.setIsTaskModalOpen);
   const LoggedInRole = useAppStore((state) => state.LoggedInRole);
 
+
   const selectedClient = clients.find(c => c.accountId._id === selectedClientId);
 
   const handleLogout = async () => {
@@ -188,6 +189,7 @@ export function Header({ onMenuClick }: HeaderProps) {
 
 export function CalendarHeader() {
   // const { currentDate, setIsTaskModalOpen } = useAppStore();
+  const setIsBulkRequestModalOpen = useAppStore((state) => state.setIsBulkRequestModalOpen);
   const currentDate = useAppStore((state) => state.currentDate);
   const setIsTaskModalOpen = useAppStore((state) => state.setIsTaskModalOpen);
   const LoggedInRole = useAppStore((state) => state.LoggedInRole);
@@ -210,7 +212,7 @@ export function CalendarHeader() {
         </Button>
         <Button
           className="bg-primary text-primary-foreground h-8 sm:h-9 px-2 sm:px-4 text-xs sm:text-sm"
-          onClick={() => setIsTaskModalOpen(true)}
+          onClick={(LoggedInRole === 'admin' && viewMode === 'admin') ? () => setIsTaskModalOpen(true) : () => setIsBulkRequestModalOpen(true)}
         >
           <Plus className="w-4 h-4 sm:mr-2" />
           {(LoggedInRole === 'admin' && viewMode === 'admin') ? <span className="hidden sm:inline">Add to Schedule</span> : <span className="hidden sm:inline">Request Work</span>}

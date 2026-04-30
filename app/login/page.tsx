@@ -12,7 +12,11 @@ import { cn } from '@/lib/utils';
 import { apiClient } from '@/lib/API_Client';
 import { BASE_URL } from '@/lib/Base_url';
 import { useAppStore } from '@/lib/store';
+import {jwtDecode ,JwtPayload} from "jwt-decode";
 
+interface customPayload extends JwtPayload{
+  role: string
+}
 export default function LoginPage() {
   const setLoggedInRole = useAppStore((state) => state.setLoggedInRole);
   const setViewMode = useAppStore((state) => state.setViewMode);
@@ -22,7 +26,6 @@ export default function LoginPage() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    role: 'admin',
     rememberMe: false,
   });
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
@@ -64,8 +67,10 @@ export default function LoginPage() {
       console.log(data);
       if (data.success) {
         // setIsLoggedIn(true);
-        setViewMode(formData.role);
-        setLoggedInRole(formData.role);
+        const decoded = jwtDecode<customPayload>(data.accessToken)
+        const userRole = decoded.role;
+        setViewMode(userRole);
+        setLoggedInRole(userRole);
         router.push('/');
       }
       localStorage.setItem('accessToken', data.accessToken);
@@ -79,10 +84,10 @@ export default function LoginPage() {
 
   };
 
-  const handleRoleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, role: e.target.value });
-    console.log(formData);
-  }
+  // const handleRoleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setFormData({ ...formData, role: e.target.value });
+  //   console.log(formData);
+  // }
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -212,7 +217,7 @@ export default function LoginPage() {
                 <p className="text-sm text-destructive">{errors.password}</p>
               )}
             </div>
-            <div className='flex gap-4'>
+            {/* <div className='flex gap-4'>
               <div className='flex gap-2'>
                 <Label>Admin</Label>
                 <input
@@ -230,7 +235,7 @@ export default function LoginPage() {
                   checked={formData.role === 'client'}
                   onChange={handleRoleChange} />
               </div>
-            </div>
+            </div> */}
 
             {/* Remember Me */}
             <div className="flex items-center gap-2">
@@ -266,7 +271,7 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          {/* Divider */}
+          {/* Divider
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-border" />
@@ -274,9 +279,9 @@ export default function LoginPage() {
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
             </div>
-          </div>
+          </div> */}
 
-          {/* Social Login */}
+          {/* Social Login
           <div className="grid grid-cols-2 gap-3">
             <Button variant="outline" className="h-12">
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -305,15 +310,15 @@ export default function LoginPage() {
               </svg>
               GitHub
             </Button>
-          </div>
+          </div> */}
 
           {/* Sign Up Link */}
-          <p className="text-center text-sm text-muted-foreground">
+          {/* <p className="text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{' '}
             <Link href="/signup" className="text-primary font-medium hover:underline">
               Sign up for free
             </Link>
-          </p>
+          </p> */}
         </div>
       </div>
     </div>
