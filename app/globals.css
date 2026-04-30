@@ -4,60 +4,62 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(0.10 0.008 60);
-  --foreground: oklch(0.97 0.004 75);
-  --card: oklch(0.15 0.010 60);
-  --card-foreground: oklch(0.97 0.004 75);
-  --popover: oklch(0.13 0.010 60);
-  --popover-foreground: oklch(0.97 0.004 75);
-  --primary: oklch(0.97 0.004 75);
-  --primary-foreground: oklch(0.10 0.008 60);
-  --secondary: oklch(0.20 0.012 60);
-  --secondary-foreground: oklch(0.97 0.004 75);
-  --muted: oklch(0.18 0.010 60);
-  --muted-foreground: oklch(0.65 0.008 75);
-  --accent: oklch(0.66 0.20 38);
-  --accent-foreground: oklch(0.99 0 0);
-  --destructive: oklch(0.58 0.22 25);
-  --destructive-foreground: oklch(0.97 0.004 75);
-  --border: oklch(0.22 0.010 60);
-  --input: oklch(0.20 0.010 60);
-  --ring: oklch(0.66 0.20 38);
+  /* Swapped: background is now light, foreground is now dark */
+  --background: oklch(0.97 0 0);
+  --foreground: oklch(0.08 0 0);
+  --card: oklch(0.95 0 0);
+  --card-foreground: oklch(0.08 0 0);
+  --popover: oklch(0.97 0 0);
+  --popover-foreground: oklch(0.08 0 0);
+  --primary: oklch(0.08 0 0);
+  --primary-foreground: oklch(0.97 0 0);
+  --secondary: oklch(0.90 0 0);
+  --secondary-foreground: oklch(0.08 0 0);
+  --muted: oklch(0.92 0 0);
+  --muted-foreground: oklch(0.40 0 0);
+  --accent: oklch(0.08 0 0);
+  --accent-foreground: oklch(0.97 0 0);
+  --destructive: oklch(0.45 0 0);
+  --destructive-foreground: oklch(0.97 0 0);
+  --border: oklch(0.85 0 0);
+  --input: oklch(0.90 0 0);
+  --ring: oklch(0.08 0 0);
   --radius: 1rem;
 
-  /* Sidebar */
-  --sidebar: oklch(0.12 0.010 60);
-  --sidebar-foreground: oklch(0.97 0.004 75);
-  --sidebar-primary: oklch(0.66 0.20 38);
-  --sidebar-border: oklch(0.20 0.010 60);
-  --sidebar-accent: oklch(0.20 0.012 60);
+  /* Sidebar Light (Now dark text on light bg) */
+  --sidebar: oklch(0.95 0 0);
+  --sidebar-foreground: oklch(0.08 0 0);
+  --sidebar-primary: oklch(0.08 0 0);
+  --sidebar-border: oklch(0.85 0 0);
+  --sidebar-accent: oklch(0.90 0 0);
 }
 
 .dark {
-  --background: oklch(0.10 0.008 60);
-  --foreground: oklch(0.97 0.004 75);
-  --card: oklch(0.15 0.010 60);
-  --card-foreground: oklch(0.97 0.004 75);
-  --popover: oklch(0.13 0.010 60);
-  --popover-foreground: oklch(0.97 0.004 75);
-  --primary: oklch(0.97 0.004 75);
-  --primary-foreground: oklch(0.10 0.008 60);
-  --secondary: oklch(0.20 0.012 60);
-  --secondary-foreground: oklch(0.97 0.004 75);
-  --muted: oklch(0.18 0.010 60);
-  --muted-foreground: oklch(0.65 0.008 75);
-  --accent: oklch(0.66 0.20 38);
-  --accent-foreground: oklch(0.99 0 0);
-  --border: oklch(0.22 0.010 60);
-  --input: oklch(0.20 0.010 60);
-  --ring: oklch(0.66 0.20 38);
+  /* Swapped: background is now dark, foreground is now light */
+  --background: oklch(0.08 0 0);
+  --foreground: oklch(0.97 0 0);
+  --card: oklch(0.12 0 0);
+  --card-foreground: oklch(0.97 0 0);
+  --popover: oklch(0.10 0 0);
+  --popover-foreground: oklch(0.97 0 0);
+  --primary: oklch(0.97 0 0);
+  --primary-foreground: oklch(0.08 0 0);
+  --secondary: oklch(0.18 0 0);
+  --secondary-foreground: oklch(0.97 0 0);
+  --muted: oklch(0.16 0 0);
+  --muted-foreground: oklch(0.55 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.08 0 0);
+  --border: oklch(0.22 0 0);
+  --input: oklch(0.18 0 0);
+  --ring: oklch(0.97 0 0);
 
-  /* Sidebar Dark */
-  --sidebar: oklch(0.12 0.010 60);
-  --sidebar-foreground: oklch(0.97 0.004 75);
-  --sidebar-primary: oklch(0.66 0.20 38);
-  --sidebar-border: oklch(0.20 0.010 60);
-  --sidebar-accent: oklch(0.20 0.012 60);
+  /* Sidebar Dark (Now light text on dark bg) */
+  --sidebar: oklch(0.10 0 0);
+  --sidebar-foreground: oklch(0.97 0 0);
+  --sidebar-primary: oklch(0.97 0 0);
+  --sidebar-border: oklch(0.20 0 0);
+  --sidebar-accent: oklch(0.18 0 0);
 }
 
 @theme inline {
