@@ -153,7 +153,7 @@ export default function LoginPage() {
               Enter your credentials to access your account
             </p>
           </div>
-          {serverErrors ? <div>{serverErrors}</div> : null}
+          {serverErrors ? <div className='text-red-500'>{serverErrors}</div> : null}
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email Field */}
             <div className="space-y-2">

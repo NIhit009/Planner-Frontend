@@ -25,54 +25,61 @@ import { apiClient } from '@/lib/API_Client';
 import { BASE_URL } from '@/lib/Base_url';
 
 // Mock Data
-const MOCK_COMPLETED_TASKS = [
-    { id: '1', title: 'Design System Update', category: 'Work', completedAt: new Date(), color: 'bg-blue-500' },
-    { id: '2', title: 'Client Onboarding', category: 'Admin', completedAt: subDays(new Date(), 2), color: 'bg-purple-500' },
-    { id: '3', title: 'Monthly Billing', category: 'Finance', completedAt: subDays(new Date(), 10), color: 'bg-emerald-500' },
-    { id: '4', title: 'Gym Session', category: 'Personal', completedAt: subDays(new Date(), 1), color: 'bg-orange-500' },
-];
+// const MOCK_COMPLETED_TASKS = [
+//     { id: '1', title: 'Design System Update', category: 'Work', completedAt: new Date(), color: 'bg-blue-500' },
+//     { id: '2', title: 'Client Onboarding', category: 'Admin', completedAt: subDays(new Date(), 2), color: 'bg-purple-500' },
+//     { id: '3', title: 'Monthly Billing', category: 'Finance', completedAt: subDays(new Date(), 10), color: 'bg-emerald-500' },
+//     { id: '4', title: 'Gym Session', category: 'Personal', completedAt: subDays(new Date(), 1), color: 'bg-orange-500' },
+// ];
 
 type FilterRange = 'all' | 'today' | 'week' | 'month';
 
 export function CompletedTasks() {
     const [filter, setFilter] = useState<FilterRange>('all');
+    const [filteredTasks, setFilteredTasks] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
-    // useEffect(() => {
-    //     const getFilteredTasks = async (date: number) => {
-    //         const response = await apiClient.get(`${BASE_URL}/getFinishedTasks?date=${date}`);
-    //         const result = response.data;
-
-    //     }
-    //     // getFilteredTasks();
-    // }, [])
-    const filteredTasks = useMemo(() => {
-        return MOCK_COMPLETED_TASKS.filter((task) => {
-            const now = new Date();
-            const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase());
-
-            let inRange = true;
-            if (filter === 'today') {
-                inRange = isSameDay(task.completedAt, now);
-            } else if (filter === 'week') {
-                inRange = isWithinInterval(task.completedAt, {
-                    start: startOfWeek(now),
-                    end: endOfWeek(now)
-                });
-            } else if (filter === 'month') {
-                inRange = isWithinInterval(task.completedAt, {
-                    start: startOfMonth(now),
-                    end: endOfMonth(now)
-                });
+    const [filterData, setFilterData] = useState<number | undefined>(undefined);
+    useEffect(() => {
+        const getFilteredTasks = async (date: number | undefined) => {
+            try {
+                const response = await apiClient.get(`${BASE_URL}/tasks/getFinishedTasks?date=${date}`);
+                const result = response.data;
+                if (!result.success) {
+                    throw new Error("Error Occured..")
+                }
+                console.log(result)
+                console.log(result.tasks);
+                setFilteredTasks(result.tasks)
+            }
+            catch(err){
+                console.log(err);
             }
 
-            return matchesSearch && inRange;
-        });
-    }, [filter, searchQuery]);
+        }
+        getFilteredTasks(filterData);
+    }, [filter])
+    function findFilter(filter: FilterRange) {
+        switch (filter) {
+            case "all":
+                setFilterData(undefined);
+                break;
+            case "today":
+                setFilterData(0);
+                break;
+            case "week":
+                setFilterData(7);
+                break;
+            case "month":
+                setFilterData(30);
+                break;
+        }
+        setFilter(filter);
+    }
 
     return (
         // Changed: removed max-w-5xl, added h-full and flex column to fill screen
         <div className="flex flex-col h-full w-full bg-background">
-            
+
             {/* HEADER & CONTROLS - Fixed at top */}
             <div className="p-6 space-y-6 border-b border-border bg-card/30 backdrop-blur-sm">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -100,7 +107,7 @@ export function CompletedTasks() {
                     {(['all', 'today', 'week', 'month'] as FilterRange[]).map((range) => (
                         <button
                             key={range}
-                            onClick={() => setFilter(range)}
+                            onClick={() => findFilter(range)}
                             className={cn(
                                 "px-6 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all",
                                 filter === range
@@ -119,9 +126,9 @@ export function CompletedTasks() {
                 <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm w-full">
                     {filteredTasks.length > 0 ? (
                         <div className="divide-y divide-border">
-                            {filteredTasks.map((task) => (
+                            {filteredTasks.map((task: any) => (
                                 <div
-                                    key={task.id}
+                                    key={task._id}
                                     className="group flex items-center justify-between p-5 hover:bg-muted/20 transition-colors"
                                 >
                                     <div className="flex items-center gap-5">
@@ -129,16 +136,16 @@ export function CompletedTasks() {
                                         <div className={cn("w-2 h-10 rounded-full shadow-sm", task.color)} />
                                         <div>
                                             <h3 className="text-base font-semibold decoration-muted-foreground/40 text-foreground/70">
-                                                {task.title}
+                                                {task.name}
                                             </h3>
                                             <div className="flex items-center gap-4 mt-1.5">
                                                 <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest bg-muted/50 px-2.5 py-1 rounded-md border border-border/50">
-                                                    {task.category}
+                                                    {task.type}
                                                 </span>
-                                                <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                                                {/* <span className="text-xs text-muted-foreground flex items-center gap-1.5">
                                                     <CalendarIcon className="w-3.5 h-3.5" />
-                                                    {format(task.completedAt, 'MMMM d, yyyy')}
-                                                </span>
+                                                    {format(task?.completedDate, 'MMMM d, yyyy')}
+                                                </span> */}
                                             </div>
                                         </div>
                                     </div>
